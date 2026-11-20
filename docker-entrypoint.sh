@@ -23,11 +23,6 @@ if ! grep -q '^APP_KEY=base64:' .env 2>/dev/null; then
     sed -i "s|^APP_KEY=.*|APP_KEY=$APP_KEY|" .env
 fi
 
-if [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then
-    sed -i "s|^APP_URL=.*|APP_URL=https://$RAILWAY_PUBLIC_DOMAIN|" .env
-    export APP_URL="https://$RAILWAY_PUBLIC_DOMAIN"
-fi
-
 sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" .env 2>/dev/null || true
 sed -i "s|^LOG_CHANNEL=.*|LOG_CHANNEL=stderr|" .env 2>/dev/null || true
 sed -i "s|^TRUSTED_PROXIES=.*|TRUSTED_PROXIES=*|" .env 2>/dev/null || true
