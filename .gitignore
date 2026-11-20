@@ -1,0 +1,29 @@
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+
+# Installed packages and build output (recreated by composer install / npm run build)
+backend/vendor/
+frontend/node_modules/
+backend/public/build/
+backend/bootstrap/ssr/
+backend/public/hot
+backend/public/storage
+
+# Runtime files
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/framework/testing/
+backend/storage/logs/*.log
+backend/.phpunit.result.cache
+
+
+# Deploy package
+*.zip
+
+# Live settings for the Bluehost zip (contains secrets)
+deploy/bluehost.env

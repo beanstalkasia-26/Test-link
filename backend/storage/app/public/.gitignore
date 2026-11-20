@@ -1,0 +1,4 @@
+# Uploaded media (resized copies) are kept in the repository.
+!*
+!*/
+.DS_Store
