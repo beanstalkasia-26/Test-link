@@ -61,7 +61,7 @@ class ContentWorkflowTest extends TestCase
 
         $this->actingAs($publisher)->get('/admin')->assertRedirect('/admin/account');
         $this->actingAs($publisher)->get('/admin/account')->assertOk();
-        $this->actingAs($editor)->get('/admin')->assertOk();
+        $this->actingAs($editor)->get('/admin')->assertRedirect('/admin/account');
     }
 
     public function test_editors_create_drafts_and_cannot_publish(): void

@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\Redirect;
 use App\Models\School;
 use App\Support\ContentCache;
+use App\Support\SiteSettings;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -21,7 +22,7 @@ class SitemapController extends Controller
     {
         $xml = ContentCache::remember('sitemap', function (): string {
             $urls = collect([['loc' => url('/'), 'lastmod' => null]])
-                ->concat(collect(['programs', 'schools', 'faculty', 'news', 'blogs'])->map(fn ($p) => ['loc' => url($p), 'lastmod' => null]));
+                ->concat(collect(['programs', 'schools', 'faculty', 'news', 'blogs'])->reject(fn ($p) => SiteSettings::pathIsHidden($p))->map(fn ($p) => ['loc' => url($p), 'lastmod' => null]));
 
             $redirected = Redirect::query()->pluck('from_path')->flip();
 
@@ -33,7 +34,7 @@ class SitemapController extends Controller
                     if ($model instanceof Post && $model->externalLink()) {
                         return;
                     }
-                    if (($path = $model->publicPath()) && ! $redirected->has(Redirect::normalizePath($path))) {
+                    if (($path = $model->publicPath()) && ! SiteSettings::pathIsHidden($path) && ! $redirected->has(Redirect::normalizePath($path))) {
                         $urls->push(['loc' => url($path), 'lastmod' => $model->updated_at?->toAtomString()]);
                     }
                 });

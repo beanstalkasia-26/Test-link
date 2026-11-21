@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CachePublicPages;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\HideDisabledModules;
 use App\Http\Middleware\HandleRedirects;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Responses\PageResponse;
@@ -19,7 +20,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SecurityHeaders::class);
-        $middleware->web(append: [
+        $middleware->web(prepend: [HideDisabledModules::class], append: [
             HandleRedirects::class,
             HandleInertiaRequests::class,
             CachePublicPages::class,

@@ -31,8 +31,6 @@ RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/docker-php-memory-lim
     && echo "upload_max_filesize = 64M" >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini \
     && echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
 
-ENV APP_KEY=base64:V0tED2uh1TWtaNsv9FWCo86+7JrmSHjLrAwNJb/3hzw=
-
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY backend/ ./

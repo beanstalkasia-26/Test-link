@@ -18,9 +18,9 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-export APP_KEY="${APP_KEY:-base64:V0tED2uh1TWtaNsv9FWCo86+7JrmSHjLrAwNJb/3hzw=}"
-if ! grep -q '^APP_KEY=base64:' .env 2>/dev/null; then
-    sed -i "s|^APP_KEY=.*|APP_KEY=$APP_KEY|" .env
+# Never ship a fixed key: use the APP_KEY variable if set, otherwise generate a private one.
+if [ -z "$APP_KEY" ] && ! grep -q '^APP_KEY=base64:' .env 2>/dev/null; then
+    php artisan key:generate --force --no-interaction
 fi
 
 if [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then
@@ -31,9 +31,6 @@ fi
 sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" .env 2>/dev/null || true
 sed -i "s|^LOG_CHANNEL=.*|LOG_CHANNEL=stderr|" .env 2>/dev/null || true
 sed -i "s|^TRUSTED_PROXIES=.*|TRUSTED_PROXIES=*|" .env 2>/dev/null || true
-sed -i "s|^ADMIN_ENFORCE_2FA=.*|ADMIN_ENFORCE_2FA=false|" .env 2>/dev/null || true
-sed -i "s|^SEED_ADMIN_EMAIL=.*|SEED_ADMIN_EMAIL=admin@namtech.test|" .env 2>/dev/null || true
-sed -i "s|^SEED_ADMIN_PASSWORD=.*|SEED_ADMIN_PASSWORD=Admin@12345678|" .env 2>/dev/null || true
 
 if ! grep -q '^INERTIA_SSR_ENABLED=' .env 2>/dev/null; then
     echo "INERTIA_SSR_ENABLED=false" >> .env
@@ -63,7 +60,8 @@ php artisan migrate --force 2>/dev/null || true
 
 echo '==> Ensuring admin user...'
 php artisan db:seed --class=RolesAndPermissionsSeeder --force 2>/dev/null || true
-php artisan db:seed --class=AdminUserSeeder --force 2>/dev/null || true
+# Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD variables to choose the login; otherwise a password is generated and printed once in these logs.
+php artisan db:seed --class=AdminUserSeeder --force || true
 
 PORT="${PORT:-8080}"
 echo "==> Starting NAMTech application on 0.0.0.0:$PORT with 4 workers..."

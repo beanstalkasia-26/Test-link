@@ -16,7 +16,6 @@ set_env SESSION_DRIVER file
 set_env CACHE_STORE file
 set_env QUEUE_CONNECTION sync
 set_env TRUSTED_PROXIES '*'
-set_env ADMIN_ENFORCE_2FA false
 set_env SESSION_SECURE_COOKIE true
 set_env INERTIA_SSR_ENABLED false
 
@@ -24,6 +23,8 @@ rm -f bootstrap/cache/*.php
 php artisan config:clear >/dev/null 2>&1
 php artisan storage:link --force >/dev/null 2>&1
 php artisan migrate --force
+php artisan db:seed --class=RolesAndPermissionsSeeder --force >/dev/null 2>&1
+php artisan db:seed --class=AdminUserSeeder --force
 
 PHP_CLI_SERVER_WORKERS=4 nohup php artisan serve --host=0.0.0.0 --port=8000 --no-reload > /tmp/serve.log 2>&1 &
 echo "NAMTECH running at $URL"

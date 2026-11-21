@@ -19,3 +19,4 @@ echo "==> Installing backend"
 cd "$ROOT/backend"
 composer install --no-interaction --optimize-autoloader
 [ -f .env ] || cp .env.example .env
+grep -q '^APP_KEY=base64:' .env || php artisan key:generate --force

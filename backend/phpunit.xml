@@ -34,6 +34,7 @@
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="INERTIA_SSR_ENABLED" value="false"/>
         <env name="ADMIN_ENFORCE_2FA" value="false"/>
+        <env name="APP_KEY" value="base64:cGhwdW5pdC10ZXN0LWtleS0wMTIzNDU2Nzg5YWJjZGU="/>
         <env name="PAGE_CACHE_ENABLED" value="true"/>
         <env name="NAMTECH_ENQUIRY_RECIPIENTS" value="enquiries@example.test"/>
     </php>

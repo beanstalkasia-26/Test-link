@@ -137,7 +137,7 @@ Permissions are checked server-side on every action. There is no public registra
 
 ## 4. Security
 
-- Fortify authentication under `/admin`: login throttling (5/min per email+IP, 30/hour per IP), password reset, two-factor authentication (TOTP + recovery codes). Two-factor is **required** for Super Admins and Publishers when `ADMIN_ENFORCE_2FA=true` (default in production). Inactive accounts cannot sign in and are signed out when deactivated.
+- Fortify authentication under `/admin`: login throttling (5/min per email+IP, 30/hour per IP), password reset, two-factor authentication (TOTP + recovery codes). Two-factor is **required** for every admin role (Super Admin, Publisher and Editor) when `ADMIN_ENFORCE_2FA=true` (default in production). Inactive accounts cannot sign in and are signed out when deactivated.
 - Sessions: encrypted, `HttpOnly`, `SameSite=Lax`, `Secure` in production (`SESSION_SECURE_COOKIE=true`). CSRF protection via Laravel's XSRF cookie.
 - Security headers on every response: `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, HSTS on HTTPS, and a Content Security Policy in production. Admin responses are `no-store` and `noindex`.
 - Uploads: content-sniffed (not the browser's MIME type), JPEG/PNG/WebP/AVIF only, size and pixel limits, random names, original kept on a private disk; only re-encoded variants are public. SVG is not accepted. The Nginx config denies script execution under `/storage`.

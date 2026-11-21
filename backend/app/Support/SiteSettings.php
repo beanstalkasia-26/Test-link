@@ -46,7 +46,53 @@ class SiteSettings
             ['name' => 'centres_listing_heading', 'type' => 'text', 'label' => 'Schools & Centres page: centres heading', 'max' => 80, 'group' => 'Listings'],
 
             ...array_map(fn (array $toggle): array => $toggle + ['type' => 'boolean', 'default' => true, 'group' => 'Show / hide'], self::Toggles),
+
+            ...array_map(fn (string $key, array $module): array => [
+                'name' => 'module_'.$key, 'label' => $module['label'], 'type' => 'boolean', 'default' => true, 'group' => 'Show / hide modules',
+                'help' => 'Switch off to remove this whole module from the site, menus and sitemap. Content is kept.',
+            ], array_keys(self::Modules), self::Modules),
         ];
+    }
+
+    /** Whole-site modules an admin can switch off. Paths are the public URL prefixes each module owns. */
+    public const Modules = [
+        'programs' => ['label' => 'Programs', 'paths' => ['programs', 'school-of-technical-education']],
+        'schools' => ['label' => 'Schools & centres', 'paths' => ['schools', 'centres']],
+        'faculty' => ['label' => 'Faculty', 'paths' => ['faculty']],
+        'news' => ['label' => 'News & media', 'paths' => ['news', 'media', 'news-events', 'press-release']],
+        'blogs' => ['label' => 'Blogs', 'paths' => ['blogs', 'blog']],
+        'events' => ['label' => 'Events', 'paths' => ['events']],
+        'publications' => ['label' => 'Publications', 'paths' => ['research-and-consultancy/publications']],
+        'careers' => ['label' => 'Careers & job applications', 'paths' => ['careers']],
+        'galleries' => ['label' => 'Galleries', 'paths' => ['campus/galleries']],
+        'stories' => ['label' => 'Impact stories', 'paths' => ['impact/stories']],
+        'partner_stories' => ['label' => 'Partner stories', 'paths' => ['partnerships/stories']],
+        'search' => ['label' => 'Site search', 'paths' => ['search']],
+    ];
+
+    /** URL prefixes (no leading slash) of every module currently switched off. */
+    public static function hiddenPaths(): array
+    {
+        $values = Setting::allValues();
+
+        return collect(self::Modules)
+            ->filter(fn (array $module, string $key): bool => ($values['module_'.$key] ?? true) === false)
+            ->flatMap(fn (array $module): array => $module['paths'])
+            ->values()
+            ->all();
+    }
+
+    public static function pathIsHidden(?string $path): bool
+    {
+        $path = trim((string) parse_url((string) $path, PHP_URL_PATH), '/');
+
+        foreach (self::hiddenPaths() as $prefix) {
+            if ($path === $prefix || str_starts_with($path, $prefix.'/')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private const Toggles = [
@@ -75,11 +121,15 @@ class SiteSettings
         $only = ['site_name', 'site_tagline', 'virtual_tour_url', 'address_title', 'address', 'phones', 'email', 'map_url', 'call_url',
             'linkedin_url', 'x_url', 'youtube_url', 'instagram_url', 'facebook_url', 'newsletter_heading', 'newsletter_consent', 'enquiry_consent', 'copyright',
             'footer_programs_title', 'footer_schools_title', 'footer_partnerships_title', 'footer_quick_links_title', 'footer_contact_title',
-            'schools_listing_heading', 'centres_listing_heading', ...array_column(self::Toggles, 'name')];
+            'schools_listing_heading', 'centres_listing_heading', ...array_column(self::Toggles, 'name'),
+            ...array_map(fn (string $key): string => 'module_'.$key, array_keys(self::Modules))];
 
         $settings = array_intersect_key($values, array_flip($only));
         foreach (self::Toggles as $toggle) {
             $settings[$toggle['name']] = (bool) $settings[$toggle['name']];
+        }
+        foreach (array_keys(self::Modules) as $key) {
+            $settings['module_'.$key] = ($values['module_'.$key] ?? true) !== false;
         }
         $settings['copyright'] = str_replace('{year}', (string) now()->year, (string) ($settings['copyright'] ?? '© {year} NAMTECH. All Rights Reserved'));
 

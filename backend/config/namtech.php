@@ -3,7 +3,7 @@
 return [
     'enforce_two_factor' => (bool) env('ADMIN_ENFORCE_2FA', true),
 
-    'two_factor_roles' => ['super-admin', 'publisher'],
+    'two_factor_roles' => ['super-admin', 'publisher', 'editor'],
 
     'enquiry_recipients' => array_filter(array_map('trim', explode(',', (string) env('NAMTECH_ENQUIRY_RECIPIENTS', '')))),
 

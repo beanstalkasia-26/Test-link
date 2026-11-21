@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SiteSettings;
 use App\Models\Concerns\FlushesPublicCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,7 +45,7 @@ class Menu extends Model
                 'newTab' => (bool) $item->opens_in_new_tab,
                 'external' => $item->isExternal(),
                 'children' => $build($item->id),
-            ])->filter(fn (array $item): bool => $item['url'] !== null || $item['children'] !== [])->values()->all();
+            ])->filter(fn (array $item): bool => ! SiteSettings::pathIsHidden($item['url']) && ($item['url'] !== null || $item['children'] !== []))->values()->all();
         };
 
         return $build(null);
