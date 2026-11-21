@@ -24,11 +24,11 @@ SKIP=(cache cache_locks sessions jobs job_batches failed_jobs password_reset_tok
 KEEP=(enquiries job_applications newsletter_subscribers)
 IG=(); for t in "${SKIP[@]}" "${KEEP[@]}"; do IG+=("--ignore-table=$DB.$t"); done
 EX=(); for t in "${SKIP[@]}"; do mysql "${C[@]}" -N -e "SHOW TABLES LIKE '$t'" "$DB" | grep -q . && EX+=("$t"); done
-D=(--single-transaction --set-gtid-purged=OFF --no-tablespaces --skip-comments --skip-add-locks --default-character-set=utf8mb4)
+DUMP=(--single-transaction --set-gtid-purged=OFF --no-tablespaces --skip-comments --skip-add-locks --default-character-set=utf8mb4)
 { echo 'SET NAMES utf8mb4; SET FOREIGN_KEY_CHECKS=0;'
-  mysqldump "${C[@]}" "${D[@]}" "${IG[@]}" "$DB"
-  mysqldump "${C[@]}" "${D[@]}" --no-data "$DB" "${EX[@]}"
-  mysqldump "${C[@]}" "${D[@]}" --no-data --skip-add-drop-table "$DB" "${KEEP[@]}" | sed 's/^CREATE TABLE `/CREATE TABLE IF NOT EXISTS `/'
+  mysqldump "${C[@]}" "${DUMP[@]}" "${IG[@]}" "$DB"
+  mysqldump "${C[@]}" "${DUMP[@]}" --no-data "$DB" "${EX[@]}"
+  mysqldump "${C[@]}" "${DUMP[@]}" --no-data --skip-add-drop-table "$DB" "${KEEP[@]}" | sed 's/^CREATE TABLE `/CREATE TABLE IF NOT EXISTS `/'
   echo 'SET FOREIGN_KEY_CHECKS=1;'; } > "$S/database/namtech.sql"
 sed -i '' -E "s#/\*!800[0-9]{2} DEFAULT ENCRYPTION='N' \*/##g" "$S/database/namtech.sql"; unset MYSQL_PWD
 echo "▸ Pruning old build files"
